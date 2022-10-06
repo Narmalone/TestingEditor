@@ -479,6 +479,7 @@ MonoBehaviour:
   y: 0.1
   z: 0.1
   verticeCount: 0
+  mustResetOnNextStart: 0
 --- !u!1 &1778585385
 GameObject:
   m_ObjectHideFlags: 0

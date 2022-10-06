@@ -97,8 +97,13 @@ public class EditorWindowTest : EditorWindow
         //Le cube est sélectionné on peut le placer ou on veut sur la map
         GameObject cube = Instantiate(source);
         cube.GetComponent<Renderer>().sharedMaterial.color = Color.black;
+        MeshFilter filter = cube.GetComponent<MeshFilter>();
+        Mesh mesh = filter.mesh;
+
+        
         cube.transform.position = inputPosition;
     }
+
 
     //Détruire tous les gameobjects instantiés
     private void ResetInstantiatedGo()
@@ -122,8 +127,16 @@ public class EditorWindowTest : EditorWindow
                 GameObject obj = Instantiate(source);
                 obj.transform.position = HandleUtility.GUIPointToWorldRay(Event.current.mousePosition).origin;
                 instantiatedGo.Add(obj);
+
+                DrawGizmoForMyScript(obj);
             }
         }
         Handles.EndGUI();
+    }
+
+    [DrawGizmo(GizmoType.Selected | GizmoType.Active)]
+    private static void DrawGizmoForMyScript(GameObject objInstantiated)
+    {
+
     }
 }
