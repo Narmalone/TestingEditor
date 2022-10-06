@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
-//[CustomEditor(typeof(Cube))]
+[CustomEditor(typeof(GameObject))]
 public class EditorSceneTest : Editor
 {
-    [SerializeField] private EditorWindow window;
-    private void OnSceneGUI()
+    public override void OnInspectorGUI()
     {
-        
+        base.OnInspectorGUI();
+        if (GUILayout.Button("GenerateCube"))
+        {
+
+        }
     }
 }
