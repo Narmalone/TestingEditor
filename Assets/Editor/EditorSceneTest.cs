@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
-[CustomEditor(typeof(GameObject))]
+[CustomEditor(typeof(LevelCreator))]
 public class EditorSceneTest : Editor
 {
     public override void OnInspectorGUI()
@@ -13,5 +13,26 @@ public class EditorSceneTest : Editor
         {
 
         }
+    }
+    private void OnEnable()
+    {
+        SceneView.duringSceneGui += OnSceneGUI;
+    }
+    private void OnDestroy()
+    {
+        SceneView.duringSceneGui -= OnSceneGUI;
+    }
+
+    private void OnSceneGUI(SceneView sceneView)
+    {
+        if(Event.current.type == EventType.MouseDown)
+        {
+            Ray worlray = HandleUtility.GUIPointToWorldRay(Event.current.mousePosition);
+            RaycastHit hitIfos;
+            if (Physics.Raycast(worlray, out hitIfos, 10000f))
+            {
+                Debug.Log("raycast en cours");
+            }
+        }      
     }
 }

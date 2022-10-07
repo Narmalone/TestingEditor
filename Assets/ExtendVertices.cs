@@ -6,6 +6,10 @@ using UnityEngine.Rendering;
 
 public class ExtendVertices : MonoBehaviour
 {
+    //Récupérer sa potision par rapport à cet objet
+    //Trouver les bons vertices 
+    [SerializeField] private GameObject objToFusion;
+
     [SerializeField] private MeshFilter m_thisMeshFilter;
     private Mesh mesh;
 
@@ -24,6 +28,7 @@ public class ExtendVertices : MonoBehaviour
     {
         m_thisMeshFilter = GetComponent<MeshFilter>();
         mesh = m_thisMeshFilter.sharedMesh;
+        mesh.
         vertices = mesh.vertices;
     }
     private void Start()
@@ -89,6 +94,13 @@ public class ExtendVertices : MonoBehaviour
         }
     }
 
+    public void CheckPosition(Transform instantiatedObject)
+    {
+        if(instantiatedObject.position != transform.position)
+        {
+        }
+    }
+
     private void OnDrawGizmosSelected()
     {
         m_thisMeshFilter = GetComponent<MeshFilter>();
@@ -97,6 +109,35 @@ public class ExtendVertices : MonoBehaviour
         if (m_thisMeshFilter == null) return;
         Gizmos.color = new Color(1, 0, 0, 0.5f);
         Gizmos.DrawCube(mesh.vertices[0], new Vector3(x, y, z));
+        Gizmos.DrawCube(mesh.vertices[1], new Vector3(x, y, z));
+        Gizmos.DrawCube(mesh.vertices[2], new Vector3(x, y, z));
+        Gizmos.DrawCube(mesh.vertices[3], new Vector3(x, y, z));
+
+        Gizmos.DrawCube(mesh.vertices[4], new Vector3(x, y, z));
+        Gizmos.DrawCube(mesh.vertices[5], new Vector3(x, y, z));
+        Gizmos.DrawCube(mesh.vertices[6], new Vector3(x, y, z));
+        Gizmos.DrawCube(mesh.vertices[7], new Vector3(x, y, z));
+
+        Gizmos.DrawCube(mesh.vertices[8], new Vector3(x, y, z));
+        Gizmos.DrawCube(mesh.vertices[9], new Vector3(x, y, z));
+        Gizmos.DrawCube(mesh.vertices[10], new Vector3(x, y, z));
+        Gizmos.DrawCube(mesh.vertices[11], new Vector3(x, y, z));
+
+        Gizmos.DrawCube(mesh.vertices[12], new Vector3(x, y, z));
+        Gizmos.DrawCube(mesh.vertices[13], new Vector3(x, y, z));
+        Gizmos.DrawCube(mesh.vertices[14], new Vector3(x, y, z));
+        Gizmos.DrawCube(mesh.vertices[15], new Vector3(x, y, z));
+
+        Gizmos.DrawCube(mesh.vertices[16], new Vector3(x, y, z));
+        Gizmos.DrawCube(mesh.vertices[17], new Vector3(x, y, z));
+        Gizmos.DrawCube(mesh.vertices[18], new Vector3(x, y, z));
+        Gizmos.DrawCube(mesh.vertices[19], new Vector3(x, y, z));
+        
+        Gizmos.DrawCube(mesh.vertices[20], new Vector3(x, y, z));
+        Gizmos.DrawCube(mesh.vertices[21], new Vector3(x, y, z));
+        Gizmos.DrawCube(mesh.vertices[22], new Vector3(x, y, z));
+        Gizmos.DrawCube(mesh.vertices[23], new Vector3(x, y, z));
+
         Debug.Log("on draw gizmo");
     }
 }
