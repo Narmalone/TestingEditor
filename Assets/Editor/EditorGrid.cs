@@ -36,20 +36,15 @@ public class EditorGrid : Editor
     public void CreateGrid()
     {
         Debug.Log("create grid");
-        //Debug.DrawLine(new Vector3(0f, 0f, 0f), Vector3.forward * 20);
+        Debug.DrawLine(new Vector3(0f, 0f, 0f), Vector3.forward * 20);
         for (int i = 0; i < lenght; i++)
-        {
-            GameObject goInstantiate = new GameObject();
-            basicPosition.x = + 1f;
-            goInstantiate.transform.position = basicPosition;
-
-            listeGameObjects.Add(goInstantiate);
-            //Debug.DrawLine(new Vector3(LineStep * i, 0f, 0f), new Vector3(LineStep * i, 0f, lineLength));
+        { 
+            Debug.DrawLine(new Vector3(LineStep * i, 0f, 0f), new Vector3(LineStep * i, 0f, lineLength));
 
             for (int j = 0; j < width; j++)
             {
 
-               // Debug.DrawLine(new Vector3(0, 0f, LineStep * j), new Vector3(lineLength, 0f, j * LineStep));
+               Debug.DrawLine(new Vector3(0, 0f, LineStep * j), new Vector3(lineLength, 0f, j * LineStep));
             }
         }
     }

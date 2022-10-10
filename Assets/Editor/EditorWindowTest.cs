@@ -4,17 +4,26 @@ using UnityEngine;
 using UnityEditor;
 using System;
 using Random = UnityEngine.Random;
+using UnityEngine.UIElements;
+using System.IO;
+using Unity.VisualScripting;
+
 public class EditorWindowTest : EditorWindow
 {
+    #region Création de la window
     [MenuItem("Window/EditorTest")]
     public static void OpenWindow()
     {
         EditorWindow.GetWindow<EditorWindowTest>("EditorTest");
     }
+    #endregion
+
+    #region Basic Variables
     /// <summary>
     /// Prefab à instantier
     /// </summary>
     static public GameObject source;
+    public GameObject previewObject;
 
     /// <summary>
     /// Si on utilise le draw
@@ -22,82 +31,188 @@ public class EditorWindowTest : EditorWindow
     private bool canSelectable;
 
     /// <summary>
-    /// Hauteur de la position en Y
-    /// </summary>
-    private float YPosition = 0f;
-  
-    /// <summary>
     /// Récupérer les types d'events de Unity
     /// </summary>
     public EventType eventType;
 
-    [Flags] public enum OurEventTypes
-    {
-        MouseDown,
-        MouseMove
-    }
-
-    public OurEventTypes ourEventType;
-
+    /// <summary>
+    /// Les objets que l'on créer s'incrémentent dans la liste puis quand on détruits la map ça comprend tous les objets dedans
+    /// </summary>
     List<GameObject> instantiatedGo = new List<GameObject>();
+
+    public Material materialPreview;
+    public Color objColor;
+
+    private bool ActivePreview = false;
+
+    private List<GameObject> SaveObjects = new List<GameObject> ();
+
+    private GUIStyle labelStyle;
+
+
+    private int CategoryIndex = 0;
+
+
+    private Vector2 scrollViewPos;
+    #endregion
+
+    #region Inspector's GUI
     private void OnGUI()
     {
+        //Catégories, servent à changer de fenêtres dans l'inspecteur
         GUILayout.BeginArea(new Rect(0f, 10f, 200f, 100f));
         GUILayout.Label("CATEGORIES", EditorStyles.boldLabel);
         GUILayout.BeginHorizontal();
 
-        if(GUILayout.Button("Selected Objects"))
+        if (GUILayout.Button("Selected Objects"))
         {
-            CreateLayout();
+            CategoryIndex = 0;
         };
-        GUILayout.Button("Level Creator");
+        if(GUILayout.Button("Tous les Prefabs"))
+        {
+            CategoryIndex = 1;
+        }
         GUILayout.EndHorizontal();
         GUILayout.EndArea();
 
-        GUILayout.BeginArea(new Rect(0f, 100f, 500f, 100f));
-        GUILayout.Label("TRANFORMS", EditorStyles.boldLabel);
-        if (GUILayout.Button("Reset Transform of GameObjects"))
+        if (CategoryIndex == 0)
         {
-            BResetTransform();
-        };
-        if (GUILayout.Button("Reset Rotation only of GameObjects"))
-        {
-            ResetRotation();
-        };
-        if (GUILayout.Button("DESTROY ALL INSTANTIATED OBJECT"))
-        {
-            ResetInstantiatedGo();
-        };
-        GUILayout.EndArea();
-        
-        GUILayout.BeginArea(new Rect(0f, 200f, 600f, 500f));
-        GUILayout.Label("CREATE OBJECTS", EditorStyles.boldLabel);
+           
+            GUILayout.BeginArea(new Rect(0f, 60f, 300f, 100f));
+            var style = new GUIStyle(GUI.skin.button);
+            style.normal.textColor = Color.yellow;
+            //Détruire la map (Foutre le bouton en rouge)
+            if (GUILayout.Button("DESTROY ALL GAMEOBJECTS PLACED", style))
+            {
+                ResetInstantiatedGo();
+            };
+            GUILayout.EndArea();
+            //Tous les boutons liés aux transforms (rotate l'objet par exemple ou reset son transform)
+            GUILayout.BeginArea(new Rect(0f, 100f, 500f, 300f));
+            GUILayout.Label("TRANFORMS", EditorStyles.boldLabel);
 
-        eventType = (EventType)EditorGUILayout.EnumFlagsField("Mode de draw", eventType);
+            //Reset transform des objets sélectionnés
+            if (GUILayout.Button("Reset Transform of GameObjects"))
+            {
+                BResetTransform();
+            };
+            //Reset que la rotation des objets sélectionnés
+            if (GUILayout.Button("Reset Rotation only of GameObjects"))
+            {
+                ResetRotation();
+            };
 
-        switch (eventType)
-        {
-            case EventType.MouseDown:
-                InstantiatePrimitive(eventType);
-                break;
-            case EventType.MouseMove:
-                InstantiatePrimitive(eventType);
-                break;
+            if (GUILayout.Button("DISCARD UNSAVED CHANGES"))
+            {
+                DiscardChanges();
+            };
+
+            if (GUILayout.Button("SAVE CHANGES"))
+            {
+                SaveChanges();
+            };
+            GUILayout.EndArea();
+
+
+            //Tout ce qui est lié à la création des objets donc le mode par lequel on dessine, création de la preview ect...
+            GUILayout.BeginArea(new Rect(0f, 250f, 600f, 500f));
+            GUILayout.Label("CREATE OBJECTS", EditorStyles.boldLabel);
+
+            eventType = (EventType)EditorGUILayout.EnumFlagsField("Mode de draw", eventType);
+
+            switch (eventType)
+            {
+                case EventType.MouseDown:
+                    InstantiatePrefab(eventType);
+                    break;
+                case EventType.MouseMove:
+                    InstantiatePrefab(eventType);
+                    break;
+            }
+            canSelectable = EditorGUILayout.Toggle("Peut créer des cubes ?", canSelectable);
+
+            source = EditorGUILayout.ObjectField("Prefab", source, typeof(GameObject), true) as GameObject;
+            materialPreview = EditorGUILayout.ObjectField("MaterialPreview", materialPreview, typeof(Material), true) as Material;
+
+            if (GUILayout.Button("Activate Preview"))
+            {
+                GeneratePreview(source);
+            };
+
+            if (source != null)
+            {
+                Rect rt = GUILayoutUtility.GetRect(100, 100);
+                EditorGUI.DrawPreviewTexture(new Rect(rt.x, rt.y, 100, 100), AssetPreview.GetAssetPreview(source));
+            }
+            GUILayout.EndArea();
         }
-        canSelectable = EditorGUILayout.Toggle("Peut créer des cubes ?", canSelectable);
-
-        source = EditorGUILayout.ObjectField("Prefab", source, typeof(GameObject), true) as GameObject;
-
-        YPosition = EditorGUILayout.FloatField("Hauteur de création des cubes", YPosition);
-
-        if (GUILayout.Button("Create Cube"))
+        else
         {
-            CreateCube();
-        };
+            string[] files = Directory.GetFiles("Assets/Prefabs", "*.prefab", SearchOption.TopDirectoryOnly);
 
-        GUILayout.EndArea();
+            //Utiliser scroll view mais ça bug quand y'a le foreach entre
+            //GUILayout.BeginScrollView(scrollViewPos, GUILayout.Width(200), GUILayout.Height(500));
+            //GUILayout.EndScrollView();
+
+
+            //Créer des catégories de préfabs donc chercher dans les subs directory ?
+            foreach (string f in files)
+            {
+
+                //Récupérer chaques prefabs depuis leur path
+                UnityEngine.Object prefab = AssetDatabase.LoadAssetAtPath(f, typeof(GameObject));
+
+                //Chacuns des prefabs ont une petite place qui leur est attribué
+                Rect rt = GUILayoutUtility.GetRect(50, 50);
+
+                //On tous les prefabs là - mettre une submail plus tard
+                prefab = EditorGUILayout.ObjectField("Prefab asset: " + prefab.name, prefab, typeof(GameObject), true) as GameObject;
+
+                if (GUILayout.Button(AssetPreview.GetAssetPreview(prefab)))
+                {
+                    SetNewPrefabSelected(prefab);
+                    if (!canSelectable) return;
+                    RefreshPreviewObject(prefab.GameObject());
+                }
+
+            }
+        }
+
+    }
+    #endregion
+
+    public void SetNewPrefabSelected(UnityEngine.Object obj)
+    {
+        source = obj.GameObject();
+        Debug.Log(source.name);
     }
 
+    #region On Scene GUI
+    /// <summary>
+    /// Lorsque le joueur est sur la sene
+    /// </summary>
+    /// <param name="sceneView"></param>
+    private void OnSceneGUI(SceneView sceneView)
+    {
+        Handles.BeginGUI();
+
+        if (canSelectable)
+        {
+            if (source == null) {
+
+                Debug.LogWarning("Mettez un prefab avant de continuer !");
+                return;
+            }
+            InstantiatePrefab(eventType);
+            if (previewObject != null) PreviewSource(previewObject);
+        }
+
+        Handles.EndGUI();
+
+    }
+    #endregion
+
+    #region Transform Functions
     /// <summary>
     /// Random des angles des GameObjects sélectionnés
     /// </summary>
@@ -125,11 +240,13 @@ public class EditorWindowTest : EditorWindow
     {
         foreach (var selectedObject in Selection.gameObjects)
         {
-            selectedObject.transform.rotation = Quaternion.Euler(0,0,0);
-            selectedObject.transform.position = new Vector3(0,0,0);
+            selectedObject.transform.rotation = Quaternion.Euler(0, 0, 0);
+            selectedObject.transform.position = new Vector3(0, 0, 0);
         }
     }
+    #endregion
 
+    #region OnEnable/OnDisable
     /// <summary>
     /// Enables/disable
     /// </summary>
@@ -137,72 +254,177 @@ public class EditorWindowTest : EditorWindow
     {
         SceneView.duringSceneGui += OnSceneGUI;
     }
-    private void OnDestroy()
+    private void OnDisable()
     {
         SceneView.duringSceneGui -= OnSceneGUI;
     }
+    #endregion
 
-
-    //Création de cubes
-    private void CreateCube()
-    {
-        //Le cube est sélectionné on peut le placer ou on veut sur la map
-        GameObject cube = Instantiate(source);
-        cube.GetComponent<Renderer>().sharedMaterial.color = Color.black;
-        MeshFilter filter = cube.GetComponent<MeshFilter>();
-        Mesh mesh = filter.mesh;
-
-        cube.transform.position = new Vector3(0f,0f,0f);
-    }
-
-   /// <summary>
-   /// Détruire tous les GameObjects qui ont été crées par l'outil
-   /// </summary>
+    #region ResetAllInstantiatedObject
+    /// <summary>
+    /// Détruire tous les GameObjects qui ont été crées par l'outil
+    /// </summary>
     private void ResetInstantiatedGo()
     {
-        foreach(GameObject go in instantiatedGo)
+        foreach (GameObject go in instantiatedGo)
         {
+            Debug.Log(instantiatedGo.Count);
             DestroyImmediate(go, true);
         }
         instantiatedGo = new List<GameObject>();
     }
+    #endregion
+
+    #region Previews Functions
 
     /// <summary>
-    /// Lorsque le joueur est sur la sene
+    /// Source équivaut au prefab, fonction appelée uniquement quand on clique sur le bouton Generate Preview
     /// </summary>
-    /// <param name="sceneView"></param>
-    private void OnSceneGUI(SceneView sceneView)
+    /// <param name="source"></param>
+    public void GeneratePreview(GameObject source)
     {
-        Handles.BeginGUI();
-        if (canSelectable)
+        if (!ActivePreview)
         {
-            InstantiatePrimitive(eventType);
-
+            if (canSelectable)
+            {
+                if (source == null) return;
+                previewObject = Instantiate(source);
+                previewObject.name = "Preview";
+                ActivePreview = true;
+                if (previewObject.GetComponent<Renderer>().sharedMaterial == null)
+                {
+                    return;
+                }
+                previewObject.GetComponent<Renderer>().sharedMaterial = materialPreview;
+                Debug.Log(ActivePreview);
+            }
         }
-
-        Handles.EndGUI();
-
+        else
+        {
+            DestroyImmediate(previewObject);
+            ActivePreview = false;
+        }
     }
 
+    public void ActivePreviewAfterChanged(GameObject newPreviewObject)
+    {
+       
+    }
+
+    /// <summary>
+    /// Fonctions qui permet de refresh la preview de l'object actuel (Ne marche pas encore !!)
+    /// Faire en sorte que la preview se refresh et pas juste la source (Attention à la destruction de GO/Assets)
+    /// </summary>
+    /// <param name="newSource"></param>
+    public void RefreshPreviewObject(GameObject newSource)
+    {
+        if (source == null) return;
+        source = newSource;
+
+        ActivePreview = false;
+
+        DestroyImmediate(previewObject);
+
+        previewObject = Instantiate(source);
+        previewObject.name = "Preview";
+        previewObject.GetComponent<Renderer>().sharedMaterial = materialPreview;
+        ActivePreview = true;
+    }
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="source"></param>
+    public void PreviewSource(GameObject source)
+    {
+        //récupérer position de la souris dans l'espace 3D
+        Ray worldRay = HandleUtility.GUIPointToWorldRay(Event.current.mousePosition);
+        RaycastHit hit;
+
+        //Checker si on est sur le sol si oui Afficher la preview
+        if (Physics.Raycast(worldRay, out hit, Mathf.Infinity))
+        {
+            //Si le gameobject touché s'appelle Floor
+            if (hit.collider.name == "Floor")
+            {
+                //Si oui on set la position de l'objet par rapport au raycast hit
+                Vector3 posToTexture = new Vector3(Mathf.Round(hit.point.x), Mathf.Round(hit.point.y), Mathf.Round(hit.point.z));
+                source.transform.position = posToTexture;
+            }
+            //Si le gameobject ne s'appelle pas preview
+            else if (hit.collider.name != "Preview")
+            {
+                //différence entre la position du hit du raycast et le centre de l'objet qu'on touche
+                float difX = hit.transform.position.x - hit.point.x;
+                float difY = hit.transform.position.y - hit.point.y;
+                float difZ = hit.transform.position.z - hit.point.z;
+
+                //future position du cube qu'on va placer
+                Vector3 newPosition;
+
+                ///va récupérer la face sur la quelle on clique et augmenter la valeur de la position pour poser le block collé a celle ci
+                //si on clique sur l'axe x du cube
+                if (difX >= 0.5f)
+                {
+                    Debug.Log(difX);
+                    newPosition = new Vector3(Mathf.Round(hit.point.x - 0.5f), Mathf.Round(hit.point.y), Mathf.Round(hit.point.z));
+                    previewObject.transform.position = newPosition;
+
+                }
+                else if (difX <= -0.5f)
+                {
+                    newPosition = new Vector3(Mathf.Round(hit.point.x + 0.5f), Mathf.Round(hit.point.y), Mathf.Round(hit.point.z));
+                    previewObject.transform.position = newPosition;
+
+                }
+                //si on clique sur l'axe Z du cube
+                if (difZ >= 0.5f)
+                {
+                    newPosition = new Vector3(Mathf.Round(hit.point.x), Mathf.Round(hit.point.y), Mathf.Round(hit.point.z - 0.5f));
+                    previewObject.transform.position = newPosition;
+                }
+                else if (difZ <= -0.5f)
+                {
+                    newPosition = new Vector3(Mathf.Round(hit.point.x), Mathf.Round(hit.point.y), Mathf.Round(hit.point.z + 0.5f));
+                    previewObject.transform.position = newPosition;
+                }
+
+                //si on clique l'axe Y du cube
+                if (difY >= 0.5f)
+                {
+                    newPosition = new Vector3(Mathf.Round(hit.point.x), Mathf.Round(hit.point.y - 0.5f), Mathf.Round(hit.point.z));
+                    previewObject.transform.position = newPosition;
+                }
+                else if (difY <= -0.5f)
+                {
+                    newPosition = new Vector3(Mathf.Round(hit.point.x), Mathf.Round(hit.point.y + 0.5f), Mathf.Round(hit.point.z));
+                    previewObject.transform.position = newPosition;
+                }
+
+            }
+        }
+
+    }
+    #endregion
+
+    #region PrefabsFunction
     /// <summary>
     /// Instantier le prefab en fonction du mode de draw
     /// Envoie d'un raycast et position du prefab par ce dernier
     /// </summary>
     /// <param name="evt"></param>
-    private void InstantiatePrimitive(EventType evt)
+    private void InstantiatePrefab(EventType evt)
     {
         EventType currEventType = evt;
-        Debug.Log(currEventType);
 
         //Le cube est sélectionné on peut le placer ou on veut sur la map
         if (Event.current.type == currEventType)
         {
             Ray worlray = HandleUtility.GUIPointToWorldRay(Event.current.mousePosition);
             RaycastHit hitIfos;
-            if (Physics.Raycast(worlray, out hitIfos, 10000f))
+            if (Physics.Raycast(worlray, out hitIfos, Mathf.Infinity))
             {
 
-                if (hitIfos.collider.name == "Floor")
+                if (hitIfos.collider.name == "Floor" || hitIfos.collider.name == "Preview")
                 {
                     GameObject obj = Instantiate(source);
 
@@ -212,7 +434,28 @@ public class EditorWindowTest : EditorWindow
                     //obj.transform.position = HandleUtility.GUIPointToWorldRay(Event.current.mousePosition).GetPoint(distanceToDraw);
                     instantiatedGo.Add(obj);
                 }
+
+
             }
-        }       
+        }
+    }
+    #endregion
+
+
+    //Récupérer la liste et à chaques modifs modifier tableau
+    //Save quand on bool le créer cube
+    public override void DiscardChanges()
+    {
+
+        Debug.Log($"{this} discarded changes!!!");
+        base.DiscardChanges();
+    }
+
+    public override void SaveChanges()
+    {
+        // Your custom save procedures here
+
+        Debug.Log($"{this} saved successfully!!!");
+        base.SaveChanges();
     }
 }
