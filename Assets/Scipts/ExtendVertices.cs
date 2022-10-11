@@ -17,7 +17,6 @@ public class ExtendVertices : MonoBehaviour
     [SerializeField] float y;
     [SerializeField] float z;
 
-    [SerializeField] private int verticeCount = 0;
     Vector3[] vertices;
 
     [SerializeField] private bool mustResetOnNextStart = false;

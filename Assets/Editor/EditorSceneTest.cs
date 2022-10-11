@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
-[CustomEditor(typeof(LevelCreator))]
 public class EditorSceneTest : Editor
 {
     public override void OnInspectorGUI()

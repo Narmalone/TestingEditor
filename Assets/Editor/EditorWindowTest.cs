@@ -62,22 +62,30 @@ public class EditorWindowTest : EditorWindow
     /// </summary>
     private Vector2 scrollViewPos;
 
+    /// <summary>
+    /// Variable qui sert à récupérer le bon dossier quand on clique sur le bouton
+    /// </summary>
     private string directorySelected;
+
     #endregion
 
     #region Inspector's GUI
     private void OnGUI()
     {
         //Catégories, servent à changer de fenêtres dans l'inspecteur
-        GUILayout.BeginArea(new Rect(0f, 10f, 600, 100f));
+        GUILayout.BeginArea(new Rect(0f, 10f, 600f, 100f));
         GUILayout.Label("CATEGORIES", EditorStyles.boldLabel);
         GUILayout.BeginHorizontal();
 
-        if (GUILayout.Button("Selected Objects", GUILayout.Width(200f)))
+        GUIStyle categoriesButtonsStyle = new GUIStyle(GUI.skin.button);
+        GUIStyle categoriesLabelSyle = new GUIStyle(GUI.skin.label);
+        categoriesButtonsStyle.normal.textColor = Color.yellow;
+
+        if (GUILayout.Button("OBJETS", categoriesButtonsStyle, GUILayout.Width(200f), GUILayout.Height(30f)))
         {
             CategoryIndex = 0;
         };
-        if(GUILayout.Button("Tous les Prefabs", GUILayout.Width(200f)))
+        if(GUILayout.Button("PREFABS", categoriesButtonsStyle, GUILayout.Width(200f), GUILayout.Height(30f)))
         {
             CategoryIndex = 1;
         }
@@ -111,18 +119,19 @@ public class EditorWindowTest : EditorWindow
                 ResetRotation();
             };
 
+            if (GUILayout.Button("SAVE CHANGES"))
+            {
+                SaveChanges();
+            };
+
             if (GUILayout.Button("DISCARD UNSAVED CHANGES"))
             {
                 DiscardChanges();
             };
 
-            if (GUILayout.Button("SAVE CHANGES"))
-            {
-                SaveChanges();
-            };
             GUILayout.EndArea();
 
-
+            #region Create Objects
             //Tout ce qui est lié à la création des objets donc le mode par lequel on dessine, création de la preview ect...
             GUILayout.BeginArea(new Rect(0f, 250f, 600f, 500f));
             GUILayout.Label("CREATE OBJECTS", EditorStyles.boldLabel);
@@ -155,6 +164,7 @@ public class EditorWindowTest : EditorWindow
                 EditorGUI.DrawPreviewTexture(new Rect(rt.x, rt.y, 100, 100), AssetPreview.GetAssetPreview(source));
             }
             GUILayout.EndArea();
+            #endregion
         }
         else
         {
@@ -162,7 +172,7 @@ public class EditorWindowTest : EditorWindow
             string[] directories = Directory.GetDirectories("Assets/Prefabs");
 
             //mettre boutons à l'horizontal en header
-            GUILayout.BeginArea(new Rect(0f, 50f, 1500f, 200f));
+            GUILayout.BeginArea(new Rect(0f, 70f, 1500f, 200f));
             GUILayout.BeginHorizontal(GUILayout.Width(1500f));
 
             //Chaques dossiers dans le tableau ont un bouton
@@ -191,53 +201,6 @@ public class EditorWindowTest : EditorWindow
 
     }
     #endregion
-         
-    /// <summary>
-    /// Envoyer le path du dossier, récupérer tous ses prefabs et les afficher
-    /// </summary>
-    /// <param name="dir"></param>
-    public void DisplayPrefabSelect(string dir)
-    {
-        scrollViewPos = GUILayout.BeginScrollView(scrollViewPos, GUILayout.Width(500f), GUILayout.Height(800f));
-
-        //Si le dossier est détruit on return la création des dossiers
-        
-        string[] files = Directory.GetFiles(dir, "*.prefab");
-        foreach (string f in files)
-        {
-            //Récupérer chaques prefabs depuis leur path
-            UnityEngine.Object prefab = AssetDatabase.LoadAssetAtPath(f, typeof(GameObject));
-
-            //Chacuns des prefabs ont une petite place qui leur est attribué
-            Rect rt = GUILayoutUtility.GetRect(50f, 50f);
-
-            //On tous les prefabs là - mettre une submail plus tard
-            prefab = EditorGUILayout.ObjectField("Prefab asset: " + prefab.name, prefab, typeof(GameObject), true) as GameObject;
-
-            //Lancer les fonctions quand le joueur clique sur le nouvel asset
-            if (GUILayout.Button(AssetPreview.GetAssetPreview(prefab)))
-            {
-                //Changer la source à instancier -> Prefab
-                SetNewPrefabSelected(prefab);
-
-                //Si le joueur ne peut pas créer de cube blc de la preview
-                if (!canSelectable) return;
-
-                //On refresh complètement la preview du joueur et on converti le UnityEngine.Object en Gameobject par une fonction de VisualScripting
-                RefreshPreviewObject(prefab.GameObject());
-            }
-        }
-        GUILayout.EndScrollView();
-    }
-    /// <summary>
-    /// Envoyer la nouvelle source obj et transformer en gameobject
-    /// </summary>
-    /// <param name="obj"></param>
-    public void SetNewPrefabSelected(UnityEngine.Object obj)
-    {
-        source = obj.GameObject();
-        Debug.Log(source.name);
-    }
 
     #region On Scene GUI
     /// <summary>
@@ -486,9 +449,57 @@ public class EditorWindowTest : EditorWindow
             }
         }
     }
+
+    /// <summary>
+    /// Envoyer le path du dossier, récupérer tous ses prefabs et les afficher
+    /// </summary>
+    /// <param name="dir"></param>
+    public void DisplayPrefabSelect(string dir)
+    {
+        scrollViewPos = GUILayout.BeginScrollView(scrollViewPos, GUILayout.Width(500f), GUILayout.Height(800f));
+
+        //Si le dossier est détruit on return la création des dossiers
+
+        string[] files = Directory.GetFiles(dir, "*.prefab");
+        foreach (string f in files)
+        {
+            //Récupérer chaques prefabs depuis leur path
+            UnityEngine.Object prefab = AssetDatabase.LoadAssetAtPath(f, typeof(GameObject));
+
+            //Chacuns des prefabs ont une petite place qui leur est attribué
+            Rect rt = GUILayoutUtility.GetRect(50f, 50f);
+
+            //On tous les prefabs là - mettre une submail plus tard
+            prefab = EditorGUILayout.ObjectField("Prefab asset: " + prefab.name, prefab, typeof(GameObject), true) as GameObject;
+
+            //Lancer les fonctions quand le joueur clique sur le nouvel asset
+            if (GUILayout.Button(AssetPreview.GetAssetPreview(prefab)))
+            {
+                //Changer la source à instancier -> Prefab
+                SetNewPrefabSelected(prefab);
+
+                //Si le joueur ne peut pas créer de cube blc de la preview
+                if (!canSelectable) return;
+
+                //On refresh complètement la preview du joueur et on converti le UnityEngine.Object en Gameobject par une fonction de VisualScripting
+                RefreshPreviewObject(prefab.GameObject());
+            }
+        }
+        GUILayout.EndScrollView();
+    }
+
+    /// <summary>
+    /// Envoyer la nouvelle source obj et transformer en gameobject
+    /// </summary>
+    /// <param name="obj"></param>
+    public void SetNewPrefabSelected(UnityEngine.Object obj)
+    {
+        source = obj.GameObject();
+        Debug.Log(source.name);
+    }
     #endregion
 
-
+    #region Changes Functions
     //Récupérer la liste et à chaques modifs modifier tableau
     //Save quand on bool le créer cube
     public override void DiscardChanges()
@@ -505,4 +516,6 @@ public class EditorWindowTest : EditorWindow
         Debug.Log($"{this} saved successfully!!!");
         base.SaveChanges();
     }
+
+    #endregion
 }

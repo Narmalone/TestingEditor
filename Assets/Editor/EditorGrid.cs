@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
-[CustomEditor(typeof(LevelCreator))]
 public class EditorGrid : Editor
 {
     [SerializeField] private bool drawLines = true;
