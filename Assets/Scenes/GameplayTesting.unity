@@ -230,6 +230,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hips: {fileID: 0}
+  physicMat: {fileID: 0}
   speed: 5
   jumpPower: 5
   strafeSpeed: 2
@@ -1906,12 +1907,16 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1163861181097929706, guid: c257e07ba0f32ae4ab90a41682328672, type: 3}
       propertyPath: speed
-      value: 10
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 1163861181097929706, guid: c257e07ba0f32ae4ab90a41682328672, type: 3}
       propertyPath: jumpPower
       value: 30
       objectReference: {fileID: 0}
+    - target: {fileID: 1163861181097929706, guid: c257e07ba0f32ae4ab90a41682328672, type: 3}
+      propertyPath: physicMat
+      value: 
+      objectReference: {fileID: 13400000, guid: 281c8c8068cfb1a4b8d7093f4fc398e7, type: 2}
     - target: {fileID: 2974885472162554410, guid: c257e07ba0f32ae4ab90a41682328672, type: 3}
       propertyPath: m_ActionEvents.Array.data[1].m_PersistentCalls.m_Calls.Array.size
       value: 1
@@ -2209,6 +2214,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hips: {fileID: 0}
+  physicMat: {fileID: 0}
   speed: 5
   jumpPower: 5
   strafeSpeed: 2
