@@ -375,7 +375,6 @@ public class EditorWindowTest : EditorWindow
                 //si on clique sur l'axe x du cube
                 if (difX >= 0.5f)
                 {
-                    Debug.Log(difX);
                     newPosition = new Vector3(Mathf.Round(hit.point.x - 0.5f), Mathf.Round(hit.point.y), Mathf.Round(hit.point.z));
                     previewObject.transform.position = newPosition;
 

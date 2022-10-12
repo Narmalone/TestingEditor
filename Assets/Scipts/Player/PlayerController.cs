@@ -22,10 +22,16 @@ public class PlayerController : MonoBehaviour
     [Header("Character's Variables")]
     [SerializeField] private float speed = 5f;
     [SerializeField] private float jumpPower = 2f;
+
+    [SerializeField] private Camera cam;
     //[SerializeField] private float strafeSpeed = 2f;
 
     private void Awake()
     {
+        if(CharacterManager.instance.EnableSplitScreen == false)
+        {
+            cam.gameObject.SetActive(false);
+        }
         playersInput = GetComponent<PlayerInput>();
 
         action = OnDeviceLost();
@@ -44,6 +50,7 @@ public class PlayerController : MonoBehaviour
     }
     private Action<PlayerInput> OnDeviceLost()
     {
+        //Ui qui dit en gros ah le câble est débranché/connection perdue
         return action;
     }
 
