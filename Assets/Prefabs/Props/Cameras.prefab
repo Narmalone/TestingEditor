@@ -96,8 +96,8 @@ GameObject:
   - component: {fileID: 265140830702914310}
   - component: {fileID: 7984258253587340356}
   - component: {fileID: 9173627006665075053}
-  - component: {fileID: 3120549841408972116}
   - component: {fileID: 290024447224278633}
+  - component: {fileID: 5980556596457106800}
   m_Layer: 0
   m_Name: Cameras
   m_TagString: Untagged
@@ -200,31 +200,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 112
   m_CollisionDetection: 0
---- !u!114 &3120549841408972116
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6264763097902846361}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: baa45679bd8b973429e98d001ea5dff8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  viewRadius: 10
-  viewAngle: 28.1
-  TargetMask:
-    serializedVersion: 2
-    m_Bits: 64
-  ObstacleMask:
-    serializedVersion: 2
-    m_Bits: 128
-  visibleTargets: []
-  edgeResolutionIteration: 64
-  edgeDistanceThreshold: 10
-  MeshResolution: 50
-  meshFilter: {fileID: 4058607669602078697}
 --- !u!114 &290024447224278633
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -239,4 +214,29 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   toRightRotation: {x: 0, y: 0, z: 0, w: 0}
   toLeftRotation: {x: 0, y: 0, z: 0, w: 0}
-  rotationSens: 0
+  isCameraFixed: 0
+--- !u!114 &5980556596457106800
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6264763097902846361}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: baa45679bd8b973429e98d001ea5dff8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  viewRadius: 5
+  viewAngle: 27.4
+  TargetMask:
+    serializedVersion: 2
+    m_Bits: 64
+  ObstacleMask:
+    serializedVersion: 2
+    m_Bits: 128
+  visibleTargets: []
+  edgeResolutionIteration: 10
+  edgeDistanceThreshold: 10
+  MeshResolution: 1
+  meshFilter: {fileID: 4058607669602078697}

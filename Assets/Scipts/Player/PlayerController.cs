@@ -28,26 +28,21 @@ public class PlayerController : MonoBehaviour
 
     private void Awake()
     {
-        if(CharacterManager.instance.EnableSplitScreen == false)
+        if(CharacterManager.instance != null)
         {
-            cam.gameObject.SetActive(false);
+            if (CharacterManager.instance.EnableSplitScreen == false)
+            {
+                cam.gameObject.SetActive(false);
+            }
         }
+       
         playersInput = GetComponent<PlayerInput>();
 
         action = OnDeviceLost();
-
         allColiders = GetComponentsInChildren<Collider>();
     }
-    private void Start()
-    {
-        foreach (Collider col in allColiders)
-        {
-            col.material = null;
-        }
-    }
-    private void OnDisable()
-    {
-    }
+   
+  
     private Action<PlayerInput> OnDeviceLost()
     {
         //Ui qui dit en gros ah le câble est débranché/connection perdue
