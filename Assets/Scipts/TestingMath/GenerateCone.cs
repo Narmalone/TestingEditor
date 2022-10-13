@@ -1,141 +1,126 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
-[RequireComponent(typeof(MeshRenderer))]
-[RequireComponent(typeof(MeshFilter))]
+[RequireComponent(typeof(MeshRenderer))]  
+[RequireComponent(typeof(MeshFilter))]  
 public class GenerateCone : MonoBehaviour
 {
-    [SerializeField] private bool generateSmoothCube = false;
-    #region trying easy cube
-    Vector3[] vertices;
-    int[] triangless;
-
-    #endregion
-
-    #region Variable SmoothCube
-    private Vector3[] baseVertices = new Vector3[8];
-    private Vector3[] finalVertices = new Vector3[24];
-
+    //Mesh
+    private MeshFilter meshFilter;
     private Mesh mesh;
 
-    private int[] triangles = new int[36];
+    //Déterminée par la position de l'objet en Y -> donc depuis le vector3 orine point
+    public float hauteur = 10f;
 
-    private int[][] allFaces = new int[6][];
+    //Prendre le point hauteur et le stocker dans une variable pour qu'on puisse le Get
+    public float radius = 5f;
 
-    private int faceNumber = 6;
+    public int segmentsNumber;
 
-    #endregion
+    //tableaux pour la création du mesh
+    private Vector3[] vertices;
+    private int[] triangles;
+    private Vector2[] uv;
 
-    void Start()
+    [SerializeField] private Transform parentToRotate;
+    [SerializeField] private bool mustUpdateMesh = false;
+
+    private void Awake()
     {
-        if (!generateSmoothCube)
-        {
-            CreateNotSmoothCube();
-        }
-        else
-        {
-            mesh = GetComponent<MeshFilter>().mesh;
-            GenerateSmoothCube();
-        }
-    }
-    #region GenerateSmoothCube
-    public void GenerateSmoothCube()
-    {
-        //Génération des sommets du cube
-        baseVertices[0] = new Vector3(1, 1, 1);
-        baseVertices[1] = new Vector3(-1, 1, 1);
-        baseVertices[2] = new Vector3(-1, -1, 1);
-        baseVertices[3] = new Vector3(1, -1, 1);
-        baseVertices[4] = new Vector3(-1, 1, -1);
-        baseVertices[5] = new Vector3(1, 1, -1);
-        baseVertices[6] = new Vector3(1, -1, -1);
-        baseVertices[7] = new Vector3(-1, -1, -1);
+        if (mustUpdateMesh) GetComponent<MeshFilter>().sharedMesh = GenerateConeMesh(segmentsNumber, radius, hauteur, vertices, triangles);
 
-        //Stocker les indices de baseVertices par faces
-        allFaces[0] = new int[4] { 0, 1, 2, 3 }; // Face arrière
-        allFaces[1] = new int[4] { 5, 0, 3, 6 }; // Face droite
-        allFaces[2] = new int[4] { 4, 5, 6, 7 }; // Face Avant
-        allFaces[3] = new int[4] { 1, 4, 7, 2 }; // Face Gauche
-        allFaces[4] = new int[4] { 5, 4, 1, 0 }; // Face Du dessus
-        allFaces[5] = new int[4] { 3, 2, 7, 6 }; // Face du dessous
-
-
-        int verticesByFace = 4;
-        int verticesCount = 0;
-        int trianglesCount = 0;
-
-        for(int face = 0; face < faceNumber; face++)
-        {
-            triangles[trianglesCount + 0] = verticesCount;
-            triangles[trianglesCount + 1] = verticesCount + 1;
-            triangles[trianglesCount + 2] = verticesCount + 2;
-            triangles[trianglesCount + 3] = verticesCount;
-            triangles[trianglesCount + 4] = verticesCount + 2;
-            triangles[trianglesCount + 5] = verticesCount + 3;
-
-            trianglesCount += faceNumber;
-
-            for(int vertex = 0; vertex < verticesByFace; vertex++)
-            {
-                Vector3 currPoint = baseVertices[allFaces[face][vertex]] * 0.5f;
-                finalVertices[verticesCount] = currPoint;
-                verticesCount++;
-            }
-        }
-
-        UpdateMesh();
+        parentToRotate.position = new Vector3(0, hauteur, 0);
+        gameObject.transform.SetParent(parentToRotate);
 
     }
-    public void UpdateMesh()
-    {
-        mesh.vertices = finalVertices;
-        mesh.triangles = triangles;
 
-        mesh.RecalculateNormals();
+    private void Update()
+    {
+        if(!mustUpdateMesh) GetComponent<MeshFilter>().sharedMesh = GenerateConeMesh(segmentsNumber, radius, hauteur, vertices, triangles);
+
+        //Merge les 2 codes FOW
     }
-
-    #endregion
-
-    private void CreateNotSmoothCube()
+    private Mesh GenerateConeMesh(int subdivisions, float radius, float hauteur, Vector3[] vertices, int[] triangles)
     {
-        MeshFilter meshFilter = GetComponent<MeshFilter>();
-        Mesh mesh = meshFilter.mesh;
+        //Créer le mesh
+        Mesh mesh = new Mesh();
+        mesh.name = "ConeMeshGenerated";
 
-        //les 8 sommets d'une cube
-        vertices = new[]{
-            new Vector3 (0, 0, 0),
-            new Vector3 (0, 1, 0),
-            new Vector3 (1, 0, 0),
-            new Vector3 (1, 1, 0),
+        //Vertex = numbre de segments + 2 car un segments à plusieurs Vertexs
+        vertices = new Vector3[subdivisions + 2];
 
-            new Vector3 (1, 0, 1),
-            new Vector3 (1, 1, 1),
-            new Vector3 (0, 0, 1),
-            new Vector3 (0, 1, 1),
-        };
+        //Set les uv si jamais texture
+        uv = new Vector2[vertices.Length];
+        uv[0] = new Vector2(0.5f, 0f);
 
+        //Triangles pareils chacuns des triangles ont 3 vertices
+        triangles = new int[(subdivisions * 2) * 3];
+
+        //Le point d'origine ne bouge jamais donc vector0
+        vertices[0] = Vector3.zero;
+
+        //Générer vertexs en fonctions des angles et du nombre de segments à créer
+        for (int i = 0, n = subdivisions - 1; i < subdivisions; i++)
+        {
+            //Ratio correspond à l'avancée de i / par le nombre de subdivision -1
+            float ratio = (float)i / n;
+
+            //Utiliser ratio qui est une équation qui évalue a et b écris a / b ou b n'équivaut pas à 0
+            float r = ratio * (Mathf.PI * 2f);
+
+            //En calculant le ratio on va pouvoir séparer chaques edges de manières équivalentes (là le placement des points)
+            //à l'aide du cosinus et du sinus
+            float x = Mathf.Cos(r) * radius;
+            float z = Mathf.Sin(r) * radius;
+
+            //ensuite on set la nouvelle position du point en fonction x et z
+            vertices[i + 1] = new Vector3(x, 0f, z);
+            
+            //Pareil pour l'uv ou on l'update
+            uv[i + 1] = new Vector2(ratio, 0f);
+        }
+
+        //On créer en gros une nouvelle edge qui repart du point d'origine jusqu'a hauteur
+        vertices[subdivisions + 1] = new Vector3(0f, hauteur, 0f);
+
+        //Pareil pour l'Uv on set nouvelle face
+        uv[subdivisions + 1] = new Vector2(0.5f, 1f);
+
+        //Construction de la face du bas
+
+        for (int i = 0, n = subdivisions - 1; i < n; i++)
+        {
+            //Chaques triangles à 3 vertexs donc on multiplie par 3 et on vient créer le triangle de manière à faire 0,1,2 à chaque fois
+            int offset = i * 3;
+            triangles[offset] = 0;
+            triangles[offset + 1] = i + 1;
+            triangles[offset + 2] = i + 2;
+        }
+
+        //Construction des côtés
+        //Même chose que le dessus
+        int bottomOffset = subdivisions * 3;
+        for (int i = 0, n = subdivisions - 1; i < n; i++)
+        {
+            //Le changement est surtout ici
+            int offset = i * 3 + bottomOffset;
+            triangles[offset] = i + 1;
+            triangles[offset + 1] = subdivisions + 1;
+            triangles[offset + 2] = i + 2;
+            Debug.Log(offset);
+        }
+
+        //Réatribution des données du mesh
         mesh.vertices = vertices;
-        //Cubes d'unity constitués de 12 triangles par pack de 3 car chaques triangles contient 3 vertices
-        triangles = new[]{
-            0,1,2,
-            2,1,3,
-            2,3,4,
-
-            4,3,5,
-            4,5,6,
-            6,5,7,
-
-            6,7,0,
-            0,7,1,
-            1,5,3,
-
-            5,1,7,
-            0,2,4,
-            4,6,0
-        };
+        mesh.uv = uv;
         mesh.triangles = triangles;
+        mesh.RecalculateBounds();
+        mesh.RecalculateNormals();
 
+        //Puis return vu que Mesh function
+        return mesh;
     }
 
 }

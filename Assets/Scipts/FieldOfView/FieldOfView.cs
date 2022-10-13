@@ -7,7 +7,7 @@ using UnityEngine;
 public class FieldOfView : MonoBehaviour
 {
     #region Variables
-    public float viewRadius;
+    public float viewRadius = 5f;
     [Range(0f, 360f)]
     public float viewAngle;
 
@@ -19,10 +19,10 @@ public class FieldOfView : MonoBehaviour
     [HideInInspector] public List<Transform> visibleTargets = new List<Transform>();
 
     //Optimisation
-    public int edgeResolutionIteration;
+    public int edgeResolutionIteration = 10;
     //threshold = limite
     //va servir pour différencier plusieurs obstacles en même temps
-    public float edgeDistanceThreshold;
+    public float edgeDistanceThreshold = 10f;
 
     //MESH
     public float MeshResolution;
