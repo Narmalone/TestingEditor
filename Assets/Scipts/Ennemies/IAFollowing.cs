@@ -8,4 +8,11 @@ public class IAFollowing : MonoBehaviour
 
     public int indexPath = 0;
 
+    public GameObject CreateGameObjects()
+    {
+        GameObject go = new GameObject();
+
+        return go;
+    }
+
 }

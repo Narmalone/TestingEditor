@@ -19,12 +19,8 @@ public class EditorBezier : Editor
 
         for(int i = 1; i < iAFollowing.pointsPath.Length; i++)
         {
-            Handles.DrawBezier(iAFollowing.pointsPath[0], iAFollowing.pointsPath[iAFollowing.indexPath], Vector3.zero, Vector3.zero, Color.white, null, 2f);
-
-            //Créer un GameObject qui va permettre de controller les béziers en gros
-            //Faire s'incrémenter les Rayons émis des béziers trouver un moyen d'incrémenter indexpath et création de Gameobject sans être en scene GUI
-            GameObject go = new GameObject();
-            go.transform.position = iAFollowing.pointsPath[iAFollowing.indexPath];
+            //Handles.DrawBezier(iAFollowing.pointsPath[0], iAFollowing.pointsPath[iAFollowing.indexPath], Vector3.zero, Vector3.zero, Color.white, null, 2f);
+            Handles.DrawLine(iAFollowing.pointsPath[0], iAFollowing.pointsPath[iAFollowing.indexPath]);
         }
     }
 
