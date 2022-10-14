@@ -396,6 +396,14 @@ PrefabInstance:
       propertyPath: edgeResolutionIteration
       value: 5
       objectReference: {fileID: 0}
+    - target: {fileID: 5980556596457106800, guid: b063566fc35d20b4bacce7e8c16cdceb, type: 3}
+      propertyPath: viewAngle
+      value: 52.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 5980556596457106800, guid: b063566fc35d20b4bacce7e8c16cdceb, type: 3}
+      propertyPath: viewRadius
+      value: 8.27
+      objectReference: {fileID: 0}
     - target: {fileID: 6264763097902846361, guid: b063566fc35d20b4bacce7e8c16cdceb, type: 3}
       propertyPath: m_Name
       value: Cameras
@@ -410,7 +418,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8850313488706009082, guid: b063566fc35d20b4bacce7e8c16cdceb, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 3.53
+      value: 1.01
       objectReference: {fileID: 0}
     - target: {fileID: 8850313488706009082, guid: b063566fc35d20b4bacce7e8c16cdceb, type: 3}
       propertyPath: m_LocalPosition.z
