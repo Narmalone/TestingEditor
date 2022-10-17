@@ -16,28 +16,22 @@ public class PlayerController : MonoBehaviour
     private bool isGrounded = true;
 
     [Header("References")]
-    [SerializeField] private Rigidbody hips;
-    [SerializeField] private PhysicMaterial physicMat;
+    [SerializeField] private Rigidbody feet1;
+    //[SerializeField] private Rigidbody feet2;
 
     [Header("Character's Variables")]
     [SerializeField] private float speed = 5f;
     [SerializeField] private float jumpPower = 2f;
 
-    [SerializeField] private Camera cam;
+    private Animator m_pc;
+
     //[SerializeField] private float strafeSpeed = 2f;
 
     private void Awake()
     {
-        if(CharacterManager.instance != null)
-        {
-            if (CharacterManager.instance.EnableSplitScreen == false)
-            {
-                cam.gameObject.SetActive(false);
-            }
-        }
-       
+        
         playersInput = GetComponent<PlayerInput>();
-
+        m_pc = GetComponent<Animator>();
         action = OnDeviceLost();
         allColiders = GetComponentsInChildren<Collider>();
     }
@@ -56,13 +50,21 @@ public class PlayerController : MonoBehaviour
     public void Move(InputAction.CallbackContext context)
     {
         direction = context.ReadValue<Vector2>();
+        if (context.performed)
+        {
+        }
+    }
+
+    private void Update()
+    {
     }
 
     public void Jump(InputAction.CallbackContext context)
     {
         if (isGrounded)
         {
-            hips.AddForce(0f, jumpPower, 0f, ForceMode.Impulse);
+            feet1.AddForce(0f, jumpPower, 0f, ForceMode.Force);
+            feet1.AddForce(0f, jumpPower, 0f, ForceMode.Force);
         }
     }
 
@@ -72,6 +74,7 @@ public class PlayerController : MonoBehaviour
     private void FixedUpdate()
     {
         //Pourquoi le forcemode force ne marche pas
-        hips.AddForce(new Vector3(direction.x, 0f, direction.y) * speed, ForceMode.Impulse);
+        feet1.AddForce(new Vector3(direction.x * speed, 0f, direction.y * speed), ForceMode.VelocityChange);
+        //feet2.AddForce(new Vector3(direction.x * speed, 0f, direction.y * speed), ForceMode.VelocityChange);
     }
 }

@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEditor;
 using PathCreation;
 using PathCreationEditor;
+
 [CustomEditor(typeof(IAFollowing))]
 public class EditorBezier : Editor
 {
@@ -47,6 +48,7 @@ public class EditorBezier : Editor
 
     }
     public void DrawOnScene(bool canRead)
+
     {
         IAFollowing iAFollowing = (IAFollowing)target;
         if (canRead)
@@ -70,11 +72,25 @@ public class EditorBezier : Editor
                     if (i < iAFollowing.pointsPath.Count -1)
                     {
                         Handles.DrawLine(iAFollowing.pointsPath[i], iAFollowing.pointsPath[i + 1]);
+                       
                     }
                 }
 
                 if(i == 0)
                 {
+
+                    //float sinA = Mathf.Sin(angle);
+                    //float cosA = Mathf.Cos(angle);
+
+                    //float tangent = sinA / cosA;
+
+                    //float degree = angle * Mathf.Rad2Deg;
+                    //float tangent = Mathf.Tan(degree);
+                    //tangent d'un point tan(a) équivaut à a/b ou ration entre sinus et cosinus tan(a) = sin(a)/cos(a)
+
+
+                    //Handles.DoPositionHandle(new Vector3(tangent, iAFollowing.pointsPath[i].y, 0f), Quaternion.identity);
+                    //Handles.DoPositionHandle(new Vector3(0f, iAFollowing.pointsPath[i].y, tangent), Quaternion.identity);
                     if (iAFollowing.toggleSphereHandle)
                     {
                         Handles.color = Color.blue;
@@ -83,10 +99,13 @@ public class EditorBezier : Editor
                     else
                     {
                         Handles.DrawLine(iAFollowing.transform.position, iAFollowing.pointsPath[0]);
-                        newPos = Handles.PositionHandle(iAFollowing.pointsPath[i], Quaternion.identity);
-                    }
+                        Handles.DrawLine(iAFollowing.transform.position, iAFollowing.pointsPath[1]);
 
-                    //Handles.DrawBezier(iAFollowing.pointsPath[i], iAFollowing.pointsPath[i + 1], Vector3.zero, Vector3.zero, Color.blue, null, 2f);
+                        //calculer la distance entre A et B puis B et C
+                        newPos = Handles.PositionHandle(iAFollowing.pointsPath[i], Quaternion.identity);
+
+                        
+                    }
                 }
                 else
                 {
@@ -101,7 +120,6 @@ public class EditorBezier : Editor
                         //Récupérer la position du point et y coller un Gizmo
                         newPos = Handles.PositionHandle(iAFollowing.pointsPath[i], Quaternion.identity);
                     }
-
                 }
 
                 //Soustraire la position au point que l'on est en train de bouger
@@ -114,6 +132,9 @@ public class EditorBezier : Editor
                 UpdateWaypointPosition(i, iAFollowing.pointsPath[i]);
             }
         }
+    }
+    public void TangentLines()
+    {
     }
 
     /// <summary>
