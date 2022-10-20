@@ -147,7 +147,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 332821317}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -5.8514795, y: 0, z: -2.7011147}
+  m_LocalPosition: {x: -6.806584, y: -0.9388132, z: -2.7559524}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -851,7 +851,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1375195209}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -8.990301, y: 0, z: 0.78666306}
+  m_LocalPosition: {x: -10.557199, y: -1.1136962, z: 1.8638577}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -970,12 +970,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pointsPath:
-  - {x: -5.8514795, y: 0.5, z: -2.7011147}
+  - {x: -6.806584, y: -0.4388132, z: -2.7559524}
   - {x: -4.041365, y: 0.5, z: -1.8446662}
   - {x: 5.355355, y: 0.5, z: 8.198758}
   - {x: -0.6050705, y: 0.5, z: 10.368269}
   - {x: -7.375387, y: 0.5, z: 7.296252}
-  - {x: -8.990301, y: 0.5, z: 0.78666306}
+  - {x: -10.557199, y: -0.6136962, z: 1.8638577}
   pointSelected: {x: 4.562255, y: 0, z: 2.447906}
   indexPath: 1
   currentIndexMove: 2

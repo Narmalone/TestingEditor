@@ -17,7 +17,7 @@ public class PlayerController : MonoBehaviour
 
     [Header("References")]
     [SerializeField] private Rigidbody feet1;
-    //[SerializeField] private Rigidbody feet2;
+    [SerializeField] private Rigidbody feet2;
 
     [Header("Character's Variables")]
     [SerializeField] private float speed = 5f;
@@ -64,7 +64,7 @@ public class PlayerController : MonoBehaviour
         if (isGrounded)
         {
             feet1.AddForce(0f, jumpPower, 0f, ForceMode.Force);
-            feet1.AddForce(0f, jumpPower, 0f, ForceMode.Force);
+            feet2.AddForce(0f, jumpPower, 0f, ForceMode.Force);
         }
     }
 
@@ -75,6 +75,6 @@ public class PlayerController : MonoBehaviour
     {
         //Pourquoi le forcemode force ne marche pas
         feet1.AddForce(new Vector3(direction.x * speed, 0f, direction.y * speed), ForceMode.VelocityChange);
-        //feet2.AddForce(new Vector3(direction.x * speed, 0f, direction.y * speed), ForceMode.VelocityChange);
+        feet2.AddForce(new Vector3(direction.x * speed, 0f, direction.y * speed), ForceMode.VelocityChange);
     }
 }

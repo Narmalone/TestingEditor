@@ -99,7 +99,6 @@ public class EditorBezier : Editor
                     else
                     {
                         Handles.DrawLine(iAFollowing.transform.position, iAFollowing.pointsPath[0]);
-                        Handles.DrawLine(iAFollowing.transform.position, iAFollowing.pointsPath[1]);
 
                         //calculer la distance entre A et B puis B et C
                         newPos = Handles.PositionHandle(iAFollowing.pointsPath[i], Quaternion.identity);
