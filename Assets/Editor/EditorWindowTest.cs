@@ -7,6 +7,7 @@ using Random = UnityEngine.Random;
 using System.IO;
 using Unity.VisualScripting;
 using System.Linq;
+using UnityEngine.UIElements;
 
 public class EditorWindowTest : EditorWindow
 {
@@ -97,7 +98,6 @@ public class EditorWindowTest : EditorWindow
     //sauvegarde de la rotation quand on place un prefab
     private Vector3 sauvegardeRot;
 
-
     //premier objet qu'on touche
     RaycastHit FirstHit;
     //distance de base de la distance qu'on check
@@ -108,14 +108,12 @@ public class EditorWindowTest : EditorWindow
     /// </summary>
     private GameObject lastObject;
 
+    private Vector2 scrollPos;
+    string t = "Dossiers Prefabs";
 
-
-    /// <summary>
-    /// Sauvegarde la rotation quand on reset le prevew object
-    /// </summary>
-
+    private int index;
     #endregion
-
+    
     #region Inspector's GUI
     private void OnGUI()
     {
@@ -126,16 +124,14 @@ public class EditorWindowTest : EditorWindow
         GUILayoutOption buttonHeight = GUILayout.Height(30f);
 
         //Varaible pour toucher à tout ce qu'il y'a dans les boutons
-        var CategoriesButtons = new GUIStyle(GUI.skin.button);
-        CategoriesButtons.fontSize = 16;
-        CategoriesButtons.alignment = TextAnchor.MiddleCenter;
-        CategoriesButtons.onHover = stylestate;
-        CategoriesButtons.normal.textColor = Color.yellow;
+        var ObjectCategory = new GUIStyle(GUI.skin.button);
+        ObjectCategory.fontSize = 16;
+
+        var PrefabCategory = new GUIStyle(GUI.skin.button);
+        PrefabCategory.fontSize = 16;
 
         var FunctionsButtons = new GUIStyle(GUI.skin.button);
         FunctionsButtons.fontSize = 16;
-        FunctionsButtons.alignment = TextAnchor.MiddleCenter;
-        FunctionsButtons.onHover = stylestate;
         FunctionsButtons.normal.textColor = Color.white;
         GUILayoutOption functionButtonWidth = GUILayout.Width(400f);
 
@@ -144,58 +140,57 @@ public class EditorWindowTest : EditorWindow
         fontStyles.fontStyle = FontStyle.BoldAndItalic;
         fontStyles.normal.textColor = Color.white;
         //faire marcher le onhover
-        fontStyles.onFocused.textColor = Color.blue;
 
         var functionsTextStyles = new GUIStyle(GUI.skin.label);
-        functionsTextStyles.fontSize = 8;
-        functionsTextStyles.fontStyle = FontStyle.Italic;
+        functionsTextStyles.fontSize = 16;
+        functionsTextStyles.fontStyle = FontStyle.Normal;
         functionsTextStyles.normal.textColor = Color.white;
-        //faire marcher le onhover
-
 
         //Catégories, servent à changer de fenêtres dans l'inspecteur
         GUILayout.BeginArea(new Rect(0f, 10f, 200f, 100f));
 
-        GUILayout.Label("CATEGORIES", fontStyles);
-
-        GUILayout.BeginHorizontal();
-
-        if (GUILayout.Button("OBJECTS", CategoriesButtons, buttonWidth, buttonHeight))
-        {
-            CategoryIndex = 0;
-        };
-
-        GUILayout.EndArea();
-
-        GUILayout.BeginArea(new Rect(250f, 33f, 200f, 100f));
-
-        if (GUILayout.Button("PREFABS", CategoriesButtons, buttonWidth, buttonHeight))
-        {
-            CategoryIndex = 1;
-        }
-        GUILayout.EndHorizontal();
-
-        GUILayout.EndArea();
-
-
+     
         if (CategoryIndex == 0)
         {
+            GUILayout.Label("CATEGORIES", fontStyles);
+
+            GUILayout.BeginHorizontal();
+
+            ObjectCategory.normal.textColor = Color.cyan;
+            if (GUILayout.Button("OBJECTS", ObjectCategory, buttonWidth, buttonHeight))
+            {
+                CategoryIndex = 0;
+            };
+
+            GUILayout.EndArea();
+
+            GUILayout.BeginArea(new Rect(250f, 33f, 200f, 100f));
+
+            PrefabCategory.normal.textColor = Color.white;
+            if (GUILayout.Button("PREFABS", PrefabCategory, buttonWidth, buttonHeight))
+            {
+                CategoryIndex = 1;
+            }
+            GUILayout.EndHorizontal();
+
+            GUILayout.EndArea();
+
 
             GUILayout.BeginArea(new Rect(0f, 100f, 400f, 100f));
 
             GUILayout.Label("LEVEL FUNCTIONS", fontStyles);
 
             //Détruire la map (Foutre le bouton en rouge)
-            if (GUILayout.Button("DESTROY ALL GAMEOBJECTS PLACED", CategoriesButtons))
+            if (GUILayout.Button("DESTROY ALL GAMEOBJECTS PLACED", FunctionsButtons))
             {
                 ResetInstantiatedGo();
             };
 
             GUILayout.EndArea();
 
-            GUILayout.BeginArea(new Rect(0f, 160f, 400f, 100f));
+            GUILayout.BeginArea(new Rect(0f, 154f, 400f, 100f));
 
-            if (GUILayout.Button("DESTROY LAST OBJECT PLACED", CategoriesButtons))
+            if (GUILayout.Button("DESTROY LAST OBJECT PLACED", FunctionsButtons))
             {
                 ResetLastInstance();
             };
@@ -241,10 +236,29 @@ public class EditorWindowTest : EditorWindow
 
             #region Create Objects
             //Tout ce qui est lié à la création des objets donc le mode par lequel on dessine, création de la preview ect...
-            GUILayout.BeginArea(new Rect(0f, 430f, 600f, 300f));
+            GUILayout.BeginArea(new Rect(0f, 440f, 600f, 50f));
             GUILayout.Label("CREATE OBJECTS", fontStyles);
+            GUILayout.EndArea();
 
-            eventType = (EventType)EditorGUILayout.EnumFlagsField("DRAWING MODE", eventType);
+            GUILayout.BeginArea(new Rect(0f, 470f, 570f, 300f));
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Prefab Selected", functionsTextStyles);
+            source = EditorGUILayout.ObjectField(source, typeof(GameObject), true) as GameObject;
+            if (source != null)
+            {
+                Rect rt = GUILayoutUtility.GetRect(100, 100);
+                EditorGUI.DrawPreviewTexture(new Rect(rt.x, rt.y, 100, 100), AssetPreview.GetAssetPreview(source));
+            }
+            GUILayout.EndHorizontal();
+            GUILayout.EndArea();
+
+            GUILayout.BeginArea(new Rect(0f, 500f, 600f, 50f));
+            GUILayout.Label("Drawing Mode", functionsTextStyles);
+            GUILayout.EndArea();
+
+            GUILayout.BeginArea(new Rect(120f, 500f, 300f, 50f));
+            eventType = (EventType)EditorGUILayout.EnumFlagsField(eventType, FunctionsButtons);
+            GUILayout.EndArea();
 
             switch (eventType)
             {
@@ -256,68 +270,105 @@ public class EditorWindowTest : EditorWindow
                     break;
             }
 
-            canSelectable = EditorGUILayout.Toggle("Peut créer des cubes ?", canSelectable);
+            GUILayout.BeginArea(new Rect(0f, 530f, 300f, 50f));
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Creating Objects ?", functionsTextStyles);
+            canSelectable = EditorGUILayout.Toggle(canSelectable);
+            GUILayout.EndHorizontal();
 
-            Snapping = EditorGUILayout.Toggle("Activer le Snap", Snapping);
-
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Snap Activated ?", functionsTextStyles);
+            Snapping = EditorGUILayout.Toggle(Snapping);
+            GUILayout.EndHorizontal();
             GUILayout.EndArea();
 
-            //------------------------ PREFAB SECTION ------------------------\\
-            GUILayout.BeginArea(new Rect(0, 700, 600f, 200f));
 
+            //------------------------ PREVIEW SECTION ------------------------\\
+            GUILayout.BeginArea(new Rect(0f, 600f, 800f, 50f));
 
             GUILayout.Label("PREVIEW", fontStyles);
-            source = EditorGUILayout.ObjectField("Prefab", source, typeof(GameObject), true) as GameObject;
+            GUILayout.EndArea();
 
-            if (isPrevievable = EditorGUILayout.Toggle("Material preview can be displayed", isPrevievable))
+            GUILayout.BeginArea(new Rect(0f, 630f, 600f, 100f));
+            GUILayout.BeginHorizontal();
+
+            GUILayout.Label("Material Preview", functionsTextStyles);
+
+            if (isPrevievable = EditorGUILayout.Toggle(isPrevievable))
             {
-                materialPreview = EditorGUILayout.ObjectField("MaterialPreview", materialPreview, typeof(Material), true) as Material;
-                if (previewObject != null)
+                GUILayout.BeginHorizontal();
+                GUILayout.Label("MaterialPreview", functionsTextStyles);
+                materialPreview = EditorGUILayout.ObjectField(materialPreview, typeof(Material), true) as Material;
+                if (previewObject.transform.parent == null)
                 {
-                    if (materialPreview != null)
+                    if (previewObject.GetComponent<Renderer>() != null)
                     {
                         previewObject.GetComponent<Renderer>().sharedMaterial = materialPreview;
                     }
                 }
-
+                GUILayout.EndHorizontal();
             }
             else
             {
-                if (previewObject != null)
-                    previewObject.GetComponent<Renderer>().sharedMaterial = materialSave;
-                if (materialPreview != null)
+                if (previewObject.transform.parent == null)
                 {
-
+                    if (previewObject.GetComponent<Renderer>())
+                    {
+                        previewObject.GetComponent<Renderer>().sharedMaterial = materialSave;
+                    }
                 }
             }
 
+            GUILayout.EndHorizontal();
+            GUILayout.EndArea();
+
+            GUILayout.BeginArea(new Rect(0f, 660f, 700f, 200f));
             if (GUILayout.Button("Activate Preview", FunctionsButtons, functionButtonWidth, buttonHeight))
             {
                 GeneratePreview(source);
             };
+
+
             if (GUILayout.Button("Reset Preview", FunctionsButtons, functionButtonWidth, buttonHeight))
             {
                 ResetePreviewVisual();
             };
-
-            if (source != null)
-            {
-                Rect rt = GUILayoutUtility.GetRect(100, 100);
-                EditorGUI.DrawPreviewTexture(new Rect(rt.x, rt.y, 100, 100), AssetPreview.GetAssetPreview(source));
-            }
-
             GUILayout.EndArea();
+
             #endregion
         }
         else
         {
+            GUILayout.EndArea();
+
+            GUILayout.Label("CATEGORIES", fontStyles);
+
+            GUILayout.BeginHorizontal();
+
+            ObjectCategory.normal.textColor = Color.white;
+            PrefabCategory.normal.textColor = Color.cyan;
+            if (GUILayout.Button("OBJECTS", ObjectCategory, buttonWidth, buttonHeight))
+            {
+                CategoryIndex = 0;
+            };
+
+
+            GUILayout.BeginArea(new Rect(250f, 25f, 200f, 100f));
+
+            if (GUILayout.Button("PREFABS", PrefabCategory, buttonWidth, buttonHeight))
+            {
+                CategoryIndex = 1;
+            }
+            GUILayout.EndHorizontal();
+
+            GUILayout.EndArea();
             //Chercher tous les sous-dossiers dans le dossier Prefabs
             string[] directories = Directory.GetDirectories("Assets/Prefabs");
 
             //mettre boutons à l'horizontal en header
-            GUILayout.BeginArea(new Rect(0f, 70f, 1500f, 200f));
-            GUILayout.BeginHorizontal(GUILayout.Width(1500f));
-
+            GUILayout.BeginHorizontal();
+            scrollPos = GUILayout.BeginScrollView(scrollPos, GUILayout.Width(200f), GUILayout.Height(800f));
+            GUILayout.Label(t, functionsTextStyles);
             //Chaques dossiers dans le tableau ont un bouton
             foreach (string dir in directories)
             {
@@ -327,19 +378,16 @@ public class EditorWindowTest : EditorWindow
                     directorySelected = dir;
                 }
             }
-            GUILayout.EndArea();
-            GUILayout.EndHorizontal();
+            GUILayout.EndScrollView();
 
-            GUILayout.BeginArea(new Rect(0f, 100f, 500f, 800f));
-
+            GUILayout.BeginVertical();
             //Si la string dossier sélectionné == null on return
             if (directorySelected == null) return;
             if (Directory.Exists(directorySelected)) DisplayPrefabSelect(directorySelected);
 
             //Lancer la fonction afin ici afin qu'elle s'update en fonction du dossier sélecionné
-
-            GUILayout.EndArea();
-
+            GUILayout.EndVertical();
+            GUILayout.EndHorizontal();
         }
 
     }
@@ -368,13 +416,11 @@ public class EditorWindowTest : EditorWindow
 
         if (Event.current.keyCode == KeyCode.A)
         {
-            Debug.Log("a pressed");
             RotateFromScrollWheel(-7.5f, previewObject);
             RotateFromScrollWheel(-7.5f, objTaille);
         }
         if (Event.current.keyCode == KeyCode.E)
         {
-            Debug.Log("E pressed");
             RotateFromScrollWheel(7.5f, previewObject);
             RotateFromScrollWheel(7.5f, objTaille);
         }
@@ -483,21 +529,34 @@ public class EditorWindowTest : EditorWindow
             if (canSelectable)
             {
                 if (source == null) return;
-                previewObject = Instantiate(source);
-                previewObject.name = "Preview";
-                ActivePreview = true;
 
-                //set up de l'objet pour check la taille
-                if (objTaille != null) DestroyImmediate(objTaille);
-                objTaille = Instantiate(previewObject);
-                objTaille.transform.position = new Vector3(DistObjTaille, DistObjTaille, DistObjTaille);
-                instantiatedGo.Add(objTaille);
-                materialSave = previewObject.GetComponent<Renderer>().sharedMaterial;
-                previewObject.GetComponent<Renderer>().sharedMaterial = materialPreview;
-                if (previewObject.GetComponent<Renderer>().sharedMaterial == null)
+                index++;
+                if(index == 0)
                 {
-                    return;
+                    previewObject = Instantiate(source);
+                    previewObject.name = "Preview";
+                    ActivePreview = true;
+
+                    //set up de l'objet pour check la taille
+                    if (objTaille != null) DestroyImmediate(objTaille);
+                    objTaille = Instantiate(previewObject);
+                    objTaille.transform.position = new Vector3(DistObjTaille, DistObjTaille, DistObjTaille);
+                    instantiatedGo.Add(objTaille);
+                    materialSave = previewObject.GetComponent<Renderer>().sharedMaterial;
+                    previewObject.GetComponent<Renderer>().enabled = true;
+                    previewObject.GetComponent<Renderer>().sharedMaterial = materialPreview;
+                    if (previewObject.GetComponent<Renderer>().sharedMaterial == null)
+                    {
+                        return;
+                    }
                 }
+                else
+                {
+                    previewObject.GetComponent<Renderer>().enabled = false;
+                    index = 0;
+                }
+
+               
             }
         }
         else
@@ -653,8 +712,13 @@ public class EditorWindowTest : EditorWindow
         previewObject = Instantiate(source);
         previewObject.name = "Preview";
         previewObject.transform.rotation = Quaternion.Euler(sauvegardeRot);
-        materialSave = previewObject.GetComponent<Renderer>().sharedMaterial;
-        previewObject.GetComponent<Renderer>().sharedMaterial = materialPreview;
+        if (previewObject.GetComponent<Renderer>())
+        {
+            materialSave = previewObject.GetComponent<Renderer>().sharedMaterial;
+            previewObject.GetComponent<Renderer>().sharedMaterial = materialPreview;
+        }
+        else { return; }
+      
         ActivePreview = true;
     }
 

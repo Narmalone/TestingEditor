@@ -1,0 +1,7 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Editor/LevelEditorStylesSheet.uss?fileID=7433441132597879392&amp;guid=bbe261d754fc46041bedfacdd483e97f&amp;type=3#LevelEditorStylesSheet" />
+    <ui:VisualElement name="VE_CATEGORIES" style="flex-direction: row;">
+        <ui:Button text="OBJECT" display-tooltip-when-elided="true" name="B_OBJECT" style="font-size: 24px;" />
+        <ui:Button text="PREFABS" display-tooltip-when-elided="true" name="B_PREFABS" style="font-size: 24px;" />
+    </ui:VisualElement>
+</ui:UXML>

@@ -86,6 +86,7 @@ public class EditorBezier : Editor
 
                     //float degree = angle * Mathf.Rad2Deg;
                     //float tangent = Mathf.Tan(degree);
+
                     //tangent d'un point tan(a) équivaut à a/b ou ration entre sinus et cosinus tan(a) = sin(a)/cos(a)
 
 
