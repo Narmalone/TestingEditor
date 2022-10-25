@@ -1,0 +1,6 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <ui:VisualElement name="VE_ParentCategory" style="position: relative; margin-top: 0;">
+        <ui:VisualElement name="VE_LabelContainer" style="height: auto;" />
+        <ui:VisualElement name="VE_CategoriesContainer" style="flex-direction: row; display: flex; margin-top: 5px; height: auto;" />
+    </ui:VisualElement>
+</ui:UXML>
