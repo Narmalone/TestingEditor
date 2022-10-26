@@ -14,13 +14,12 @@ public class LevelEditor : EditorWindow
     {
         var Window = EditorWindow.GetWindow<LevelEditor>();
         Window.titleContent = new GUIContent("Level Editor");
-        Window.minSize = new Vector2(800, 600);
     }
     #endregion
 
 
     #region Basic Variables
-    private int indexCategory = 0;
+    //private int indexCategory = 0;
 
     TemplateContainer treeAssetObject;
     TemplateContainer treeAssetPrefabs;
