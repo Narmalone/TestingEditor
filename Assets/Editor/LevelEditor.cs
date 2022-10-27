@@ -32,8 +32,6 @@ public class LevelEditor : EditorWindow
         GenerateObjectCategory();
         GeneratePrefabsCategory();
         DisplayCategory(treeAssetObject, treeAssetPrefabs);
-
-        Debug.Log("On Enable");
     }
     public void GenerateButtons(int count, VisualElement parent, List<Button> listToAddBtns, params string[] btnsName)
     {
@@ -42,7 +40,7 @@ public class LevelEditor : EditorWindow
             Button btn = new Button();
             listToAddBtns.Add(btn);
 
-            if (btnsName[i] != null) ;
+            if (btnsName[i] != null)
             btn.name = btnsName[i];
 
             parent.Add(btn);

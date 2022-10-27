@@ -74,7 +74,7 @@ public class PlayerController : MonoBehaviour
     private void FixedUpdate()
     {
         //Pourquoi le forcemode force ne marche pas
-        feet1.AddForce(new Vector3(direction.x * speed, 0f, direction.y * speed), ForceMode.VelocityChange);
-        feet2.AddForce(new Vector3(direction.x * speed, 0f, direction.y * speed), ForceMode.VelocityChange);
+        //feet1.AddForce(new Vector3(direction.x * speed, 0f, direction.y * speed), ForceMode.VelocityChange);
+        //feet2.AddForce(new Vector3(direction.x * speed, 0f, direction.y * speed), ForceMode.VelocityChange);
     }
 }

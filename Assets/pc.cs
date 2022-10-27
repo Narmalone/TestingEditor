@@ -1,37 +1,44 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
-[RequireComponent(typeof(CharacterController))]
+using UnityEngine.InputSystem;
 public class pc : MonoBehaviour
 {
-    private CharacterController controller;
+    private InputActionAsset inputAsset;
+    private InputActionMap player;
+    private InputAction move;
+    private CharacterController characterController;
+    private Vector2 position;
     public float speed = 5f;
-    private void Awake()
+    void Awake()
     {
-        controller = GetComponent<CharacterController>();
+        inputAsset = GetComponent<PlayerInput>().actions;
+        player = inputAsset.FindActionMap("Player");
+        characterController = GetComponent<CharacterController>();
     }
-    // Update is called once per frame
-    void Update()
+
+    private void OnEnable()
     {
-        float x = Input.GetAxis("Horizontal");
-        float z = Input.GetAxis("Vertical");
+        player.FindAction("Move").started += DoMove;
+        move = player.FindAction("Move");
 
-        Vector3 move = transform.right * x + transform.forward * z;
+        player.Enable();
+    }
 
-        controller.Move(move * speed * Time.deltaTime);
+    private void OnDisable()
+    {
+        player.FindAction("Move").started -= DoMove;
 
-        if (Input.GetKey(KeyCode.Z))
-        {
-        }
-        if (Input.GetKey(KeyCode.S))
-        {
-        }
-        if (Input.GetKey(KeyCode.Q))    
-        {
-        }
-        if (Input.GetKey(KeyCode.D))
-        {
-        }
+        player.Disable();
+    }
+    private void DoMove(InputAction.CallbackContext obj)
+    {
+        position = obj.ReadValue<Vector2>();
+        Debug.Log("do move");
+    }
+    private void Update()
+    {
+        transform.Translate(new Vector3(position.x, 0f, position.y) * speed * Time.deltaTime, Space.World);
     }
 }

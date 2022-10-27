@@ -18,9 +18,6 @@ public class Laser : MonoBehaviour
     //si dans le mask ou bien trouve le collider à un script on l'ajoute
     public List<Collider> colliders;
 
-    private bool isRaycasting = false;
-
-    private int indexCollider = 0;
     private void Awake()
     {
         lineRenderer = GetComponent<LineRenderer>();
