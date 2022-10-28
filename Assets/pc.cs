@@ -8,22 +8,21 @@ public class pc : MonoBehaviour
     private InputActionAsset inputAsset;
     private InputActionMap player;
     private InputAction move;
-    private CharacterController characterController;
+
     private Vector2 position;
     public float speed = 5f;
     void Awake()
     {
         inputAsset = GetComponent<PlayerInput>().actions;
         player = inputAsset.FindActionMap("Player");
-        characterController = GetComponent<CharacterController>();
     }
 
     private void OnEnable()
     {
+        player.Enable();
+
         player.FindAction("Move").started += DoMove;
         move = player.FindAction("Move");
-
-        player.Enable();
     }
 
     private void OnDisable()
